@@ -1,0 +1,32 @@
+{
+	"name": "SqlServerTable2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServer1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "name",
+				"type": "varchar"
+			},
+			{
+				"name": "age",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "salary",
+				"type": "bigint",
+				"precision": 19
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "emp_stg"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

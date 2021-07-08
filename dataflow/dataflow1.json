@@ -1,0 +1,49 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "emp",
+						"type": "DatasetReference"
+					},
+					"name": "Emp"
+				},
+				{
+					"dataset": {
+						"referenceName": "dept",
+						"type": "DatasetReference"
+					},
+					"name": "Dept"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SqlServerTable3",
+						"type": "DatasetReference"
+					},
+					"name": "Dept10data"
+				},
+				{
+					"dataset": {
+						"referenceName": "SqlServerTable4",
+						"type": "DatasetReference"
+					},
+					"name": "Deptotherdata"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DeptJoin"
+				},
+				{
+					"name": "Dept10"
+				}
+			],
+			"script": "source(output(\n\t\tname as string,\n\t\tage as long,\n\t\tsalary as long,\n\t\tdept as long\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Emp\nsource(output(\n\t\tdept as long,\n\t\tdeptname as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Dept\nEmp, Dept join(Emp@dept == Dept@dept,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> DeptJoin\nDeptJoin split(Emp@dept==10,\n\tdisjoint: false) ~> Dept10@(Dept10, deptother)\nDept10@Dept10 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tname,\n\t\tage,\n\t\tsalary,\n\t\tdept = Dept10@Dept10@dept,\n\t\tdeptname\n\t)) ~> Dept10data\nDept10@deptother sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tname,\n\t\tage,\n\t\tsalary,\n\t\tdept = Dept10@deptother@dept,\n\t\tdeptname\n\t)) ~> Deptotherdata"
+		}
+	}
+}
