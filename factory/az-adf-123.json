@@ -1,0 +1,9 @@
+{
+	"name": "az-adf-123",
+	"location": "westus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "65f4ed80-9625-41b8-89c1-15f83aa43a0e",
+		"tenantId": "604c1504-c6a3-4080-81aa-b33091104187"
+	}
+}
