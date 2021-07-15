@@ -5,6 +5,11 @@
 			"referenceName": "SqlServer2",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"Table": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "SqlServerTable",
 		"schema": [
@@ -51,7 +56,10 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "dim_agent"
+			"table": {
+				"value": "@dataset().Table",
+				"type": "Expression"
+			}
 		}
 	}
 }
