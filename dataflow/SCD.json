@@ -1,0 +1,47 @@
+{
+	"name": "SCD",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Excel1",
+						"type": "DatasetReference"
+					},
+					"name": "BlobDource"
+				},
+				{
+					"dataset": {
+						"referenceName": "SqlServerTable5",
+						"type": "DatasetReference"
+					},
+					"name": "Maxkey"
+				},
+				{
+					"dataset": {
+						"referenceName": "SqlServerTable5",
+						"type": "DatasetReference"
+					},
+					"name": "Targetref"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "Select1"
+				},
+				{
+					"name": "CrossJoin"
+				},
+				{
+					"name": "Join1"
+				},
+				{
+					"name": "UnMatch"
+				}
+			],
+			"script": "source(output(\n\t\tAgentid as integer,\n\t\tName as string,\n\t\tDesignation as string,\n\t\tContactno as integer,\n\t\tLocation as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> BlobDource\nsource(output(\n\t\tmaxkey as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tquery: 'select max(scdkey) as maxkey from\\ndbo.dim_agent',\n\tformat: 'query') ~> Maxkey\nsource(output(\n\t\tscdkey as integer,\n\t\tAgentid as long,\n\t\tAgentname as string,\n\t\tDesination as string,\n\t\tcontactno as long,\n\t\tLocation as string,\n\t\tIsActive as integer,\n\t\tfromdate as date,\n\t\ttodate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> Targetref\nBlobDource select(mapColumn(\n\t\tSrc_Agentid = Agentid,\n\t\tSrc_Name = Name,\n\t\tSrc_Designation = Designation,\n\t\tSrc_Contactno = Contactno,\n\t\tSrc_Location = Location\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nSelect1, Maxkey join(1==1,\n\tjoinType:'cross',\n\tbroadcast: 'auto')~> CrossJoin\nCrossJoin, Targetref join(Src_Agentid == Agentid,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> Join1\nJoin1 split(ERROR_FUNCTION(''),\n\tdisjoint: false) ~> UnMatch@(, )"
+		}
+	}
+}

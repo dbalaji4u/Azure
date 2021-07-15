@@ -1,0 +1,57 @@
+{
+	"name": "SqlServerTable5",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServer2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "scdkey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Agentid",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Agentname",
+				"type": "varchar"
+			},
+			{
+				"name": "Desination",
+				"type": "varchar"
+			},
+			{
+				"name": "contactno",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Location",
+				"type": "varchar"
+			},
+			{
+				"name": "IsActive",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "fromdate",
+				"type": "date"
+			},
+			{
+				"name": "todate",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "dim_agent"
+		}
+	}
+}
