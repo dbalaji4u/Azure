@@ -5,21 +5,13 @@
 			"referenceName": "lsblob1",
 			"type": "LinkedServiceReference"
 		},
-		"parameters": {
-			"folder": {
-				"type": "string"
-			}
-		},
 		"annotations": [],
 		"type": "Excel",
 		"typeProperties": {
+			"sheetName": "Sheet1",
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": "Ageng.xlsx",
-				"folderPath": {
-					"value": "@dataset().folder",
-					"type": "Expression"
-				},
 				"container": "input"
 			},
 			"firstRowAsHeader": true

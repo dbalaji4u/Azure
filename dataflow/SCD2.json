@@ -20,8 +20,21 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [],
-			"script": "source(output(\n\t\tAgentid as string,\n\t\tName as string,\n\t\tDesignation as string,\n\t\tContactno as string,\n\t\tLocation as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource(output(\n\t\tscdkey as integer,\n\t\tAgentid as long,\n\t\tAgentname as string,\n\t\tDesination as string,\n\t\tcontactno as long,\n\t\tLocation as string,\n\t\tIsActive as integer,\n\t\tfromdate as date,\n\t\ttodate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source2"
+			"transformations": [
+				{
+					"name": "addHash"
+				},
+				{
+					"name": "Filter1"
+				},
+				{
+					"name": "addhashexisting"
+				},
+				{
+					"name": "Exists1"
+				}
+			],
+			"script": "parameters{\n\tPrimarykey as string ('Agentid'),\n\tKeycols as string ('Agentname,Desination')\n}\nsource(output(\n\t\tAgentid as string,\n\t\tName as string,\n\t\tDesignation as string,\n\t\tContactno as string,\n\t\tLocation as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource(output(\n\t\tscdkey as integer,\n\t\tAgentid as long,\n\t\tAgentname as string,\n\t\tDesination as string,\n\t\tcontactno as long,\n\t\tLocation as string,\n\t\tIsActive as integer,\n\t\tfromdate as date,\n\t\ttodate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source2\nsource1 derive(id_hash = md5(byNames(split($Primarykey,','))),\n\t\tcolumn_hash = md5(byNames(split($Keycols,',')))) ~> addHash\nsource2 filter(toInteger(byName('IsActive'))   ==1) ~> Filter1\nFilter1 derive(id_hash = md5(byNames(split($Primarykey,','))),\n\t\tcolumn_hash = md5(byNames(split($Keycols,',')))) ~> addhashexisting\naddHash, addhashexisting exists(addHash@id_hash == addhashexisting@id_hash\n\t&& addHash@column_hash == addhashexisting@column_hash,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1"
 		}
 	}
 }
